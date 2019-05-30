@@ -62,3 +62,12 @@
   become: yes
   file: path={{ conf_dir }}/security state=directory owner={{ es_user }} group={{ es_group }}
   changed_when: False
+
+- name: add values to Elasticsearch keystore
+  become: yes
+  shell: "echo {{ item.value }}| {{ es_home }}/bin/elasticsearch-keystore add -f {{ item.key }}"
+  loop: "{{ es_keystore_keys|dict2items }}"
+  environment:
+    ES_PATH_CONF: "{{ conf_dir }}"
+  when: es_keystore_keys is defined
+  no_log: true
